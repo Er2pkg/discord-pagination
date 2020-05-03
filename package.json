@@ -1,0 +1,26 @@
+{
+  "name": "discord-pagination",
+  "version": "1.0.0",
+  "description": "A simple Discord.js pagination module",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Er2pkg/discord-pagination.git"
+  },
+  "keywords": [
+    "discord",
+    "discord.js",
+    "pagination",
+    "Er2",
+    "Ertu"
+  ],
+  "author": "Er2",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Er2pkg/discord-pagination/issues"
+  },
+  "homepage": "https://github.com/Er2pkg/discord-pagination#readme",
+  "dependencies": {
+    "discord.js": "^12.2.0"
+  }
+}
