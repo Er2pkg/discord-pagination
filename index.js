@@ -29,15 +29,23 @@ get(page) {return this.cache.get(page)}
  *@class {DiscordPagination}
  */
 class DiscordPagination {
-constructor() {
-this.pageButtons = [{e: '◀', act: 'prev'}, {e: '⏹', act: 'delete'}, {e: '▶', act: 'next'}]
+constructor(discord) {
+if(discord) discord.pagination = this
+
+this.defaultChooserHandler = (e, n) => {
+switch(e) {
+case 'choose': return 'We found serveal options of content. Choose one of options'; break
+case 'choosed': return 'You choosed: a'.replace('a', n); break
+case 'error': return 'Error to find an option. Returns 1'; break
+}}
+this.defaultPageButtons = [{e: '◀', act: 'prev'}, {e: '⏹', act: 'delete'}, {e: '▶', act: 'next'}]
 }
 
 /**
  *Show a page
  *@param {Array} content Unfiltered content
- *@param {Number} page Page
- *@param {Number} onOne Elements on 1 page
+ *@param {Number} [page=1] Page
+ *@param {Number} [onOne=15] Elements on 1 page
  *@returns {Array} Page array
  */
 showPage = (content, page = 1, onOne = 15) => content.slice(((page - 1) * onOne), (onOne) + ((page - 1) * onOne))
@@ -47,13 +55,13 @@ showPage = (content, page = 1, onOne = 15) => content.slice(((page - 1) * onOne)
  *@param {message} msg Message from Discord client
  *@param {Function(page)} mcontent Function to render message
  *@param {Array} content Unfiltered content
- *@param {Number} onOne Elements on 1 page
- *@param {Number} page Start page
- *@param {Number} time Time when over reaction collector
- *@param {Array} pageButtons Page buttons
- *@param {Boolean} loop Loop the pages?
+ *@param {Number} [onOne=15] Elements on 1 page
+ *@param {Number} [page=1] Start page
+ *@param {Number} [time=300000] Time when over reaction collector in ms
+ *@param {Array} [pageButtons=this.defaultPageButtons] Page buttons
+ *@param {Boolean} [loop=true] Loop the pages?
  */
-message = async (msg, mcontent, content, onOne = 15, page = 1, time = 300000, pageButtons = this.pageButtons, loop = true) => {
+message = async (msg, mcontent, content, onOne = 15, page = 1, time = 300000, pageButtons = this.defaultPageButtons, loop = true) => {
 let pages = [], totalPages = Math.ceil(content.length/onOne)
 if(page < 1 || page > totalPages) page = 1
 for(let x=1;x<=totalPages;x++) pages.push({page: x, totalPages: totalPages, content: this.showPage(content, x, onOne)})
@@ -71,16 +79,42 @@ if(loop) {
 if(page == 1) page = totalPages
 else page--
 } else if(page == 1) page = 1; else page--
-if(typeof mcontent == 'function') message.edit(mcontent(pages.get(page)))
+message.edit(mcontent(pages.get(page)))
 }
 if(act == 'next') {
 if(loop) {
 page++
 if(page > totalPages) page = 1
 } else if(page<totalPages) page++
-if(typeof mcontent == 'function') message.edit(mcontent(pages.get(page)))
+message.edit(mcontent(pages.get(page)))
 }
 })
 }
+/**
+ *Choose an option
+ *@param {message} msg Message from Discord client
+ *@param {Array} content Content to choose
+ *@param {Function(event, number)} [chooseHandler=this.defaultChooseHandler] ChooseHandler
+ *@param {Boolean} [deletee=true] Delete a message?
+ *@param {Number} [atts=3] Attempts
+ *@returns {Promise} Promise object with the number and message
+ */
+optionChooser = (msg, content, chooseHandler = this.defaultChooseHandler, deletee = true, atts = 3) =>
+new Promise(async res => {
+const message = await msg.channel.send(chooseHandler('choose')+'\n'+content.map((i,d)=>(d+1)+'. '+i).join('\n')).catch(() => null)
+let i=1,
+options = content.length,
+collector = new Discord.MessageCollector(msg.channel, a => a.author.id == msg.author.id, { time: 120000 })
+collector.on('collect', msge => {
+let num = parseInt(msge.content.slice(0, options.length))
+if(num!==NaN&&num>0&&num<=options) {message.edit(chooseHandler('choosed', num)); if(deletee) message.delete({timeout: 2000}); collector.stop(); return res(num, message)}
+else if(i!==atts) i++
+else {
+message.edit(chooseHandler('error'))
+if(deletee) message.delete({timeout: 2000})
+collector.stop()
+return res(1, message)
+}})})
+
 }
-module.exports = new DiscordPagination()
+module.exports = DiscordPagination
