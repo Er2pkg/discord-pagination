@@ -2,17 +2,15 @@
 
 This is a simple module for discord.js v.12 where you can working with pages
 
-Init: `new (require('discord-pagination'))(Discord)`
-
-or `const pagination = new (require('discord-pagination))()`
+Init: `const Pagination = new (require('discord-pagination'))(Discord) //Sets vars to constant and Discord library`
 
 ## Example
 
 ```js
 /* Full usage
-pagination.showPage(content, page, onOneElements)
-pagination.message(message, messageRender, arrayContent, onOneElements, page, time, pageButtons, loop)
-pagination.optionChooser(message, arrayContent, chooseHandler, delete, atts)
+Pagination.showPage(content, page, onOneElements)
+Pagination.message(message, messageRender, arrayContent, onOneElements, page, time, pageButtons, loop)
+Pagination.optionChooser(message, arrayContent, chooseHandler, delete, atts)
 */
 
 const Discord = require('discord.js'),
@@ -32,11 +30,11 @@ client.on('message', message => {
 if(message.content.startsWith('!test')) {
 message.test = message.content.split('!test')[1]
 if(message.test == '1')
-message.channel.send(Discord.pagination.showPage(testCon, 1, 6).join('\n'))
+message.channel.send(Discord.Pagination.showPage(testCon, 1, 6).join('\n'))
 if(message.test == '2')
-Discord.pagination.message(message, testCb, testCon, 6)
+Discord.Pagination.message(message, testCb, testCon, 6)
 if(message.test == '3')
-Discord.pagination.optionChooser(message, Discord.pagination.showPage(testCon, 1, 6), false).then(testCb2)
+Discord.Pagination.optionChooser(message, Discord.Pagination.showPage(testCon, 1, 6), false).then(testCb2)
 }
 })
 client.login('TOKEN')
@@ -45,7 +43,7 @@ client.login('TOKEN')
 ### Customize
 
 ```js
-Discord.pagination.message(message, render, arrayContent, onOneElements, page, time, [...])
+Discord.Pagination.message(message, render, arrayContent, onOneElements, page, time, [...])
 /* [...] is array
 Must be like this:
 [{e: '◀', act: 'prev'}, {e: '⏹', act: 'delete'}, {e: '▶', act: 'next'}]

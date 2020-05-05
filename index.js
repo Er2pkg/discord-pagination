@@ -1,12 +1,14 @@
-﻿const Discord = require('discord.js'),
-BaseManager = Discord.BaseManager
+﻿const discord = require('discord.js'),
+Base = discord.Base
+BaseManager = discord.BaseManager
 
 /**
  * Page class
  *@returns {Page}
  */
-class Page {
+class Page extends Base {
 constructor(a, data) {
+super(a)
 this.page = data.page
 this.content = data.content
 this.totalPages = data.totalPages
@@ -29,8 +31,13 @@ get(page) {return this.cache.get(page)}
  *@class {DiscordPagination}
  */
 class DiscordPagination {
-constructor(discord) {
-if(discord) discord.pagination = this
+constructor(Discord) {
+//Discord integration
+if(Discord) {
+Discord.Pagination = this
+Discord.Page = Page
+Discord.PageManager = PageManager
+}
 
 this.defaultChooserHandler = (e, n) => {
 switch(e) {
@@ -67,6 +74,7 @@ if(page < 1 || page > totalPages) page = 1
 for(let x=1;x<=totalPages;x++) pages.push({page: x, totalPages: totalPages, content: this.showPage(content, x, onOne)})
 pages = new PageManager(pages)
 const message = await msg.channel.send(mcontent(pages.get(page))).catch(() => null)
+pageButtons = pageButtons.filter(i => totalPages==1?(i.act == 'delete'):i)
 pageButtons.forEach(async i => await message.react(i.e))
 const collector = message.createReactionCollector((r, user) => pageButtons.find(i => i.e == r.emoji.name) && user.id == msg.author.id, {time: time})
 collector.on('collect', r => {
@@ -97,23 +105,23 @@ message.edit(mcontent(pages.get(page)))
  *@param {Function(event, number)} [chooseHandler=this.defaultChooseHandler] ChooseHandler
  *@param {Boolean} [deletee=true] Delete a message?
  *@param {Number} [atts=3] Attempts
- *@returns {Promise} Promise object with the number and message
+ *@returns {Promise} Promise array with the number and message
  */
 optionChooser = (msg, content, chooseHandler = this.defaultChooseHandler, deletee = true, atts = 3) =>
 new Promise(async res => {
 const message = await msg.channel.send(chooseHandler('choose')+'\n'+content.map((i,d)=>(d+1)+'. '+i).join('\n')).catch(() => null)
 let i=1,
 options = content.length,
-collector = new Discord.MessageCollector(msg.channel, a => a.author.id == msg.author.id, { time: 120000 })
+collector = new discord.MessageCollector(msg.channel, a => a.author.id == msg.author.id, { time: 120000 })
 collector.on('collect', msge => {
 let num = parseInt(msge.content.slice(0, options.length))
-if(num!==NaN&&num>0&&num<=options) {message.edit(chooseHandler('choosed', num)); if(deletee) message.delete({timeout: 2000}); collector.stop(); return res(num, message)}
+if(('a'+num)!=='aNaN'&&num>0&&num<=options) {message.edit(chooseHandler('choosed', num)); if(deletee) message.delete({timeout: 2000}); collector.stop(); return res([num, message])}
 else if(i!==atts) i++
 else {
 message.edit(chooseHandler('error'))
 if(deletee) message.delete({timeout: 2000})
 collector.stop()
-return res(1, message)
+return res([1, message])
 }})})
 
 }
