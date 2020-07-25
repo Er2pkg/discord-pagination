@@ -26,7 +26,9 @@ require('fs')
 .forEach(i=>require('./funcs/'+i)(this))
 }
 
-applyParams(func, ...params) {
+applyParams(func, k = true, ...params) {
+if(!k)
+return {...this.defaultParams[func], ...params[0]}
 let p = {...this.defaultParams}[func],
 pi = Object.keys(p)
 params.forEach((i,d)=>p[pi[d]]=i)

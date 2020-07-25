@@ -7,8 +7,7 @@
  */
 module.exports = ths => {
 ths.showPage = (opts, ...params) => {
-if(params.length>0 || Array.isArray(opts))
-opts = ths.applyParams('showPage', opts, ...params)
+opts = ths.applyParams('showPage', opts, (params.length>0 || Array.isArray(opts)), ...params)
 return opts.content.slice(((opts.page - 1) * opts.onOne), (opts.onOne) + ((opts.page - 1) * opts.onOne))
 }
 }
