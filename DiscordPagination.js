@@ -31,7 +31,7 @@ if(!k)
 return {...this.defaultParams[func], ...params[0]}
 let p = {...this.defaultParams}[func],
 pi = Object.keys(p)
-params.forEach((i,d)=>p[pi[d]]=i)
+params.forEach((i,d)=>!i?'':p[pi[d]]=i)
 return p
 }
 }

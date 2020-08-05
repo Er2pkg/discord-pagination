@@ -13,7 +13,7 @@
 module.exports = ths => {
 ths.optionChooser = (opts, ...params) =>
 new Promise(async res => {
-opts = ths.applyParams('optionChooser', opts, (params.length>0 || opts.client), ...params)
+opts = ths.applyParams('optionChooser', (params.length>0 || opts.client), opts, ...params)
 const message = await opts.msg.channel.send(opts.chooseHandler('choose')+'\n'+opts.content.map((i,d)=>(d+1)+'. '+i).join('\n')).catch(() => null)
 let i=1,
 options = opts.content.length,

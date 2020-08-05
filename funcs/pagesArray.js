@@ -6,7 +6,7 @@
  */
 module.exports = ths => {
 ths.pagesArray = (opts, ...params) => {
-opts = ths.applyParams('pagesArray', opts, (params.length>0 || Array.isArray(opts)), ...params)
+opts = ths.applyParams('pagesArray', (params.length>0 || Array.isArray(opts)), opts, ...params)
 let pages = []
 for(let i of opts.content) {
 pages.push({

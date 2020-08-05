@@ -1,6 +1,6 @@
 {
   "name": "discord-pagination",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "A simple Discord.js pagination module",
   "main": "DiscordPagination.js",
   "repository": {

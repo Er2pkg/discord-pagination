@@ -12,7 +12,7 @@
  */
 module.exports = ths => {
 ths.message = async (opts, ...params) => {
-opts = ths.applyParams('message', opts, (params.length>0 || opts.client), ...params)
+opts = ths.applyParams('message', (params.length>0 || opts.client), opts, ...params)
 let
 pages = new ths.PageManager(ths.pagesArray(opts.content, opts.onOne), opts.msg.client, ths)
 const message = await opts.msg.channel.send(opts.render(pages.get(opts.page))).catch(() => null)
